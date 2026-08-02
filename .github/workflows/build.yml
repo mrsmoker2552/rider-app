@@ -6,33 +6,32 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Get Repository Code
+        run: |
+          git clone https://github.com/${{ github.repository }}.git .
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Clone Flutter
+      - name: Clone Flutter SDK
         run: |
           git clone https://github.com/flutter/flutter.git -b 3.19.6 --depth 1 _flutter
           echo "$GITHUB_WORKSPACE/_flutter/bin" >> $GITHUB_PATH
 
-      - name: Doctor and Dependencies
-        run: |
-          flutter doctor
-          flutter pub get
+      - name: Get Dependencies
+        run: flutter pub get
 
-      - name: Build APK
+      - name: Build Release APK
         run: flutter build apk --release
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
         with:
           name: rider-app-apk
           path: build/app/outputs/flutter-apk/app-release.apk
